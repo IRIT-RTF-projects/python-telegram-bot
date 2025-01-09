@@ -119,7 +119,7 @@ async def choose_send_time(message: types.Message, state: FSMContext):
     await state.set_state(AddSubscription.choosing_interval)
 
     kb = [
-        [KeyboardButton(text=24), KeyboardButton(text=72), KeyboardButton(text=168)]
+        [KeyboardButton(text='24'), KeyboardButton(text='72'), KeyboardButton(text='168')]
     ]
 
     await message.answer(
