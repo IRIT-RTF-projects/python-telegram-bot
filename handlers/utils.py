@@ -31,3 +31,9 @@ async def check_location_exists(user_id: int, location_name: str, session: Async
 
 async def create_subscription(subscription_data: Dict[str, any], session: AsyncSession):
     return await subscription_crud.create(subscription_data, session)
+
+async def get_user_subscriptions(user_id: int, session: AsyncSession):
+    return await subscription_crud.get_user_subscriptions(user_id, session)
+
+async def get_subscription_by_id(subscription_id: int, session: AsyncSession):
+    return await subscription_crud.get(subscription_id, session)

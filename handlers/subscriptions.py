@@ -16,11 +16,63 @@ router = Router()
 @router.callback_query(F.data == commands.my_subscriptions)
 async def get_my_locations(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
+    user_id = callback.from_user.id
+
+    subscriptions = []
+    async with Session() as session:
+        subscriptions = await utils.get_user_subscriptions(user_id, session)
+    
+    for subscription in subscriptions:
+        builder.row(
+            InlineKeyboardButton(
+                text=f'{subscription.location.name} {subscription.next_event_time}',
+                callback_data=commands.get_subscription_info(str(subscription.id))
+            )
+        )
+
     builder.row(InlineKeyboardButton(text=commands.add_subscription, callback_data=commands.add_subscription))
     builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
-    await callback.message.answer("ваши подписки на погоду", reply_markup=builder.as_markup())
+
+    await callback.message.answer("Ваши подписки на погоду", reply_markup=builder.as_markup())
     await types.Message.delete(callback.message)
 
+
+@router.callback_query(
+    F.data.contains(commands.get_subscription_info(''))
+)
+async def get_subscription_info(callback: types.CallbackQuery):
+    command = commands.get_subscription_info
+    data = callback.data
+    subscription_id = data[data.find(command) + len(command):]
+
+    builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardBuilder(text='Удалить подписку'), callback_data= commands.delete_subscription(subscription_id))
+    builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
+
+    subscription = None
+    async with Session() as session:
+        subscription = await utils.get_subscription_by_id(int(subscription_id), session)
+    
+    subscription_detail_type = None
+    for detail_type_alias, detail_type in commands.detail_types:
+        if detail_type == subscription.detail_type:
+            subscription_detail_type = detail_type_alias
+
+    subscription_data = (
+        f'Локация: {subscription.location.name}'
+        f'Следующий отчет: {subscription.next_event_time}'
+        f'Тип отчета: {subscription_detail_type}'
+        f'Период между отчетами: {subscription.period} часов'
+    )
+
+    await callback.message.answer(text=subscription_data, reply_markup=builder.as_markup())
+    await types.Message.delete(callback.message)
+
+@router.callback_query(
+    F.data.contains(commands.delete_subscription(''))
+)
+async def delete_subscription(callback: types.CallbackQuery):
+    await callback.message.answer(text='в работе')
 
 class AddSubscription(StatesGroup):
     choosing_location = State()
@@ -124,7 +176,7 @@ async def choose_send_time(message: types.Message, state: FSMContext):
 
     await message.answer(
         text=(
-            'Выберите или напишите сами интервал в часах между сообщениями'
+            'Выберите или напишите сами интервал в часах между сообщениями\n'
             'Пример: 72 будет значить каждые 3 дня, a 168 раз в неделю'
         ),
         reply_markup=ReplyKeyboardMarkup(keyboard=kb, one_time_keyboard=True, resize_keyboard=True)

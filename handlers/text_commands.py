@@ -24,4 +24,11 @@ class Commands(BaseModel):
     def get_detail_type(self, detail_type): # detailed / short
         return f'detail_type {detail_type}'
 
+    def get_subscription_info(self, subscription_id):
+        return f'subscr_info {subscription_id}'
+    
+    def delete_subscription(self, subscription_id):
+        return f'del_subscr {subscription_id}'
+
+
 commands = Commands()
