@@ -21,14 +21,17 @@ class Commands(BaseModel):
     
     detail_types: List[Tuple[str, str]] = [('Детализированный отчет', 'detailed'), ('Краткий отчет', 'short')]
 
-    def get_detail_type(self, detail_type): # detailed / short
+    def get_detail_type(self, detail_type) -> str: # detailed / short
         return f'detail_type {detail_type}'
 
-    def get_subscription_info(self, subscription_id):
+    def get_subscription_info(self, subscription_id) -> str:
         return f'subscr_info {subscription_id}'
     
-    def delete_subscription(self, subscription_id):
+    def delete_subscription(self, subscription_id) -> str:
         return f'del_subscr {subscription_id}'
+    
+    def delete_location(self, location_id) -> str:
+        return f'del_locat {location_id}'
 
 
 commands = Commands()

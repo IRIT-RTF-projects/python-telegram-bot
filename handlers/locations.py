@@ -52,7 +52,18 @@ async def get_weather_in_location(callback: CallbackQuery):
     except Exception as err:
         print(err)
         forecast = "Извините произошла ошибка при обращении к open-meteo. Попробуйте позднее"
-    await callback.message.answer(text=forecast)
+    
+    builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text='Удалить локацию', callback_data=commands.delete_location(location.id)))
+    builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
+    await callback.message.answer(text=forecast, reply_markup=builder.as_markup())
+    await types.Message.delete(callback.message)
+
+@router.callback_query(
+    F.data.contains(commands.delete_location(''))
+)
+async def delete_location(callback: types.CallbackQuery):
+    await callback.message.answer(text='в работе')
 
 
 class CreateLocation(StatesGroup):
