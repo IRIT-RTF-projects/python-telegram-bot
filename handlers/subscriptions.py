@@ -124,7 +124,7 @@ async def choose_send_time(message: types.Message, state: FSMContext):
 
     await message.answer(
         text=(
-            'Выберите или напишите сами интервал в часах между сообщениями',
+            'Выберите или напишите сами интервал в часах между сообщениями'
             'Пример: 72 будет значить каждые 3 дня, a 168 раз в неделю'
         ),
         reply_markup=ReplyKeyboardMarkup(keyboard=kb, one_time_keyboard=True, resize_keyboard=True)
