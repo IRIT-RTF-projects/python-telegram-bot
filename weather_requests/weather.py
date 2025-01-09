@@ -70,6 +70,7 @@ class Weather:
 
         result = ''
         for i in range(number_of_days):
+            if not day: continue
             day = days[i]
             result += f"""
 {day['time']}
