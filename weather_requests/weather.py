@@ -91,6 +91,7 @@ class Weather:
         params.latitude = latitude
         params.longitude = longitude
         forecast = await self.do_api_call(params=params)
+        response = ''
         if weather_now:
             response += self.parse_weather_now(forecast)
         response += self.parse_forecast(forecast, number_of_days)
