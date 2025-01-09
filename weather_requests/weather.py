@@ -48,7 +48,7 @@ class Weather:
     ) -> str:
         return f"""
 Сейчас
-Температура: {forecast.current_weather.temperature} градусов
+Температура: {forecast.current_weather.temperature}°C
 Скорость ветра: {forecast.current_weather.wind_speed} м/с
 """
 
@@ -73,15 +73,15 @@ class Weather:
             if not day: continue
             result += f"""
 {day['time']}
-Температура: от {day['temperature_2m_max']} до {day['temperature_2m_min']}
-Ощущается как: от {day['apparent_temperature_max']} до {day['apparent_temperature_min']}
-Порывы ветра до: {day['wind_gusts_10m_max']}
-Скорость ветра до: {day['wind_speed_10m_max']}
+Температура: от {day['temperature_2m_max']}°C до {day['temperature_2m_min']}°C
+Ощущается как: от {day['apparent_temperature_max']}°C до {day['apparent_temperature_min']}°C
+Порывы ветра до: {day['wind_gusts_10m_max']} км/ч
+Скорость ветра до: {day['wind_speed_10m_max']} км/ч
 Восход: {datetime.fromisoformat(day['sunrise']) + timedelta(hours=5)}
 Закат: {datetime.fromisoformat(day['sunset']) + timedelta(hours=5)}
-Осадков за день: {day['precipitation_hours']} часов {day['precipitation_sum']} мм
+Осадков за день: {day['precipitation_hours']} часов
+Общее количество осадков: {day['precipitation_sum']} мм
 """
-        return result
 
     async def get_weather_forecast(
             self,
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     # test connection to open-meteo
     async def main():
         forecast: Forecast = await weather.get_weather_forecast(10.0, 10.0, 10, True)
-        print(forecast)
+        print(forecast.current_weather)
 
     asyncio.run(main())
 
