@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import asyncio
 from typing import List, Dict
 from pydantic import BaseModel
@@ -18,7 +19,7 @@ class Weather:
         latitude=0,
         longitude=0,
         current_weather=True,
-        timezone='Europe/Moscow',
+        timezone='UTC',
         daily=[
             DailyParameters.APPARENT_TEMPERATURE_MAX,
             DailyParameters.APPARENT_TEMPERATURE_MIN,
@@ -41,11 +42,43 @@ class Weather:
             forecast = await open_meteo.forecast(**params.model_dump())
         return forecast
     
-    async def parse_weather_now(self):
-        pass
+    async def parse_weather_now(
+            self,
+            forecast: Forecast,
+    ) -> str:
+        return f"""
+Сейчас
+Температура: {forecast.current_weather.temperature} градусов
+Скорость ветра: {forecast.current_weather.wind_speed} м/с
 
-    async def parse_forecast(self):
-        pass
+"""
+
+    def parse_forecast(
+            self,
+            forecast: Forecast,
+            days: int
+        ) -> str:
+        forecast = forecast.to_dict()
+        days = [None for _ in range(14)]
+        for name, values_list in forecast['daily'].items():
+            if not values_list: continue
+            for i in range(len(values_list)):
+                days[i] = days[i] or {}
+                days[i][name] = values_list[i]
+
+        result = ''
+        for day in days:
+            result += f"""
+{day['time']}
+Температура: от {day['temperature_2m_max']} до {day['temperature_2m_min']}
+Ощущается как: от {day['apparent_temperature_max']} до {day['apparent_temperature_min']}
+Порывы ветра до: {day['wind_gusts_10m_max']}
+Скорость ветра до: {day['wind_speed_10m_max']}
+Восход: {datetime.fromisoformat(day['sunrise']) + timedelta(hours=5)}
+Закат: {datetime.fromisoformat(day['sunset']) + timedelta(hours=5)}
+Осадков за день: {day['precipitation_hours']} часов {day['precipitation_sum']} мм
+
+"""
 
     async def get_weather_forecast(
             self,
@@ -53,23 +86,15 @@ class Weather:
             longitude: float,
             number_of_days: int,
             weather_now: bool = False
-            ):
+    ):
         params = self.detailed_request_params
         params.latitude = latitude
         params.longitude = longitude
         forecast = await self.do_api_call(params=params)
-        forecast_dict = forecast.to_dict()
-        days = [None for _ in range(14)]
-        for name, values_list in forecast_dict['daily'].items():
-            if not values_list: continue
-            for i in range(len(values_list)):
-                days[i] = days[i] or {}
-                days[i][name] = values_list[i]
-
-        for day in days:
-            if day: print(day) 
-        
-        return ""
+        if weather_now:
+            response += self.parse_weather_now(forecast)
+        response += self.parse_forecast(forecast, number_of_days)
+        return response
 
 
 
