@@ -70,8 +70,8 @@ class Weather:
 
         result = ''
         for i in range(number_of_days):
-            if not day: continue
             day = days[i]
+            if not day: continue
             result += f"""
 {day['time']}
 Температура: от {day['temperature_2m_max']} до {day['temperature_2m_min']}
