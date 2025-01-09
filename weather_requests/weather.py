@@ -1,4 +1,5 @@
-from typing import List, Optional
+import asyncio
+from typing import List, Dict
 from pydantic import BaseModel
 
 from open_meteo import OpenMeteo, Forecast
@@ -39,13 +40,20 @@ class Weather:
         async with OpenMeteo() as open_meteo:
             forecast = await open_meteo.forecast(**params.model_dump())
         return forecast
+    
+    async def parse_weather_now(self):
+        pass
+
+    async def parse_forecast(self):
+        pass
 
     async def get_weather_forecast(
             self,
             latitude: float,
             longitude: float,
-            number_of_days: int
-            ) -> str:
+            number_of_days: int,
+            weather_now: bool = False
+            ):
         params = self.detailed_request_params
         params.latitude = latitude
         params.longitude = longitude
@@ -60,14 +68,20 @@ class Weather:
 
         for day in days:
             if day: print(day) 
+        
         return ""
-
-    async def get_weather_now(self, forecast: Forecast) -> str:
-        pass
-
-    async def get_weather_tomorrow(self, forecast: Forecast) -> str:
-        pass
 
 
 
 weather = Weather()
+
+
+if __name__ == '__main__':
+    # test connection to open-meteo
+    async def main():
+        forecast: Forecast = await weather.get_weather_forecast(10.0, 10.0, 10, True)
+        print(forecast.current_weather)
+
+    asyncio.run(main())
+
+

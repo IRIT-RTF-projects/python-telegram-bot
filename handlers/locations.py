@@ -40,7 +40,18 @@ async def get_weather_in_location(callback: CallbackQuery):
     location = None
     async with Session() as session:
         location = await utils.check_location_exists(user_id, location_name, session)
-    forecast = await weather.get_weather_forecast(location.latitude, location.longitude)
+
+    forecast = None
+    try:
+        forecast = await weather.get_weather_forecast(
+            location.latitude,
+            location.longitude,
+            number_of_days=1,
+            weather_now=True
+        )
+    except Exception as err:
+        print(err)
+        forecast = "Извините произошла ошибка при обращении к open-meteo. Попробуйте позднее"
     await callback.message.answer(text=forecast)
 
 
