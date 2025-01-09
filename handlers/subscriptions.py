@@ -100,15 +100,12 @@ async def choose_detail_type(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(detail_type=detail_type)
     await state.set_state(AddSubscription.choosing_send_time)
 
-    kb = [
-        [types.CopyTextButton(text=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]
-    ]
-
     await callback.message.answer(
         text=(
             'Выберите когда прислать первый отчет\n'
-            'Пришлите боту время в формате'
-        ), reply_markup=types.InlineKeyboardMarkup(inline_keyboard=kb)
+            'Пришлите боту время в формате\n'
+            f'`{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`'
+        ), parse_mode='MarkdownV2'
     )
 
     await types.Message.delete(callback.message)
