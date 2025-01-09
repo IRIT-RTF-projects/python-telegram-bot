@@ -103,7 +103,7 @@ async def choose_detail_type(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text=(
             'Выберите когда прислать первый отчет\n'
-            f'Необходим формат времени {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}'
+            f'Необходим формат времени `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`\n'
             'Пришлите боту время в этом формате'
         )
     )

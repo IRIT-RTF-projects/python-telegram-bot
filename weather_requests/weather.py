@@ -109,8 +109,8 @@ weather = Weather()
 if __name__ == '__main__':
     # test connection to open-meteo
     async def main():
-        forecast: Forecast = await weather.get_weather_forecast(10.0, 10.0, 10, True)
-        print(forecast.current_weather)
+        forecast: Forecast = await weather.get_weather_forecast(10.0, 10.0, 5, True)
+        print(forecast)
 
     asyncio.run(main())
 
