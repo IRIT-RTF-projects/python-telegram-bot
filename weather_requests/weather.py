@@ -82,6 +82,7 @@ class Weather:
 Осадков за день: {day['precipitation_hours']} часов
 Общее количество осадков: {day['precipitation_sum']} мм
 """
+            return result
 
     async def get_weather_forecast(
             self,
