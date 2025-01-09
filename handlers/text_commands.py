@@ -9,7 +9,7 @@ class Commands(BaseModel):
     weather_now: str = 'Погода здесь и сейчас'
     request_location: str = 'request_location'
     get_menu: str = 'get_menu'
-    get_help: str = 'памагити'
+    get_help: str = 'Помощь'
     add_location: str = 'Добавить локацию'
     add_subscription: str = 'Добавить подписку'
 

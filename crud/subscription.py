@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.crud_base import CrudBase
@@ -19,11 +20,13 @@ class SubscriptionCrud(CrudBase):
         locations = locations.scalars().all()
         location_ids = [l.id for l in locations]
         subscriptions = await session.execute(
-            select(Subscription)
-            .join(Location, Location.id == Subscription.location_id)
-            .where(Subscription.id.in_(location_ids))
+            select(Subscription, Location)
+            .join(Location)
+            .where(Subscription.location_id.in_(location_ids))
+            .options(selectinload(Subscription.location))
         )
-        return subscriptions.scalars().all()
+        subscriptions = subscriptions.scalars().all()
+        return subscriptions
     
     async def get(
             self,
@@ -31,9 +34,11 @@ class SubscriptionCrud(CrudBase):
             session: AsyncSession
     ):
         obj = await session.execute(
-            select(Subscription)
-            .join(Location, Location.id == Subscription.location_id)
+            select(Subscription, Location)
+            .join(Location)
             .where(Subscription.id == item_id)
+            .options(selectinload(Subscription.location))
         )
+        return obj.scalars().first()
 
 subscription_crud = SubscriptionCrud(Subscription)

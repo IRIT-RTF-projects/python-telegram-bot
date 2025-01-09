@@ -22,14 +22,14 @@ async def get_my_subscriptions(callback: types.CallbackQuery):
     async with Session() as session:
         subscriptions = await utils.get_user_subscriptions(user_id, session)
     
-    for subscription in subscriptions:
-        builder.row(
-            InlineKeyboardButton(
-                text=f'{subscription.location.name} {subscription.next_event_time}',
-                callback_data=commands.get_subscription_info(str(subscription.id))
+        for subscription in subscriptions:
+            builder.row(
+                InlineKeyboardButton(
+                    text=f'{subscription.location.name} {subscription.next_event_time}',
+                    callback_data=commands.get_subscription_info(str(subscription.id))
+                )
             )
-        )
-    print('chto proishodit')
+
     builder.row(InlineKeyboardButton(text=commands.add_subscription, callback_data=commands.add_subscription))
     builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
 
@@ -41,17 +41,19 @@ async def get_my_subscriptions(callback: types.CallbackQuery):
     F.data.contains(commands.get_subscription_info(''))
 )
 async def get_subscription_info(callback: types.CallbackQuery):
-    command = commands.get_subscription_info
+    command = commands.get_subscription_info('')
     data = callback.data
     subscription_id = data[data.find(command) + len(command):]
 
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardBuilder(text='Удалить подписку'), callback_data= commands.delete_subscription(subscription_id))
+    builder.row(InlineKeyboardButton(text='Удалить подписку', callback_data= commands.delete_subscription(subscription_id)))
     builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
 
     subscription = None
+    location_name = None
     async with Session() as session:
         subscription = await utils.get_subscription_by_id(int(subscription_id), session)
+        location_name = subscription.location.name
     
     subscription_detail_type = None
     for detail_type_alias, detail_type in commands.detail_types:
@@ -59,9 +61,9 @@ async def get_subscription_info(callback: types.CallbackQuery):
             subscription_detail_type = detail_type_alias
 
     subscription_data = (
-        f'Локация: {subscription.location.name}'
-        f'Следующий отчет: {subscription.next_event_time}'
-        f'Тип отчета: {subscription_detail_type}'
+        f'Локация: {location_name}\n'
+        f'Следующий отчет: {subscription.next_event_time}\n'
+        f'Тип отчета: {subscription_detail_type}\n'
         f'Период между отчетами: {subscription.period} часов'
     )
 
