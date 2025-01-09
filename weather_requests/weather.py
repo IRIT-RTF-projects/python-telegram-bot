@@ -42,7 +42,7 @@ class Weather:
             forecast = await open_meteo.forecast(**params.model_dump())
         return forecast
     
-    async def parse_weather_now(
+    def parse_weather_now(
             self,
             forecast: Forecast,
     ) -> str:
