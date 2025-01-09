@@ -50,7 +50,6 @@ class Weather:
 Сейчас
 Температура: {forecast.current_weather.temperature} градусов
 Скорость ветра: {forecast.current_weather.wind_speed} м/с
-
 """
 
     def parse_forecast(
@@ -81,8 +80,8 @@ class Weather:
 Восход: {datetime.fromisoformat(day['sunrise']) + timedelta(hours=5)}
 Закат: {datetime.fromisoformat(day['sunset']) + timedelta(hours=5)}
 Осадков за день: {day['precipitation_hours']} часов {day['precipitation_sum']} мм
-
 """
+        return result
 
     async def get_weather_forecast(
             self,
@@ -110,7 +109,7 @@ if __name__ == '__main__':
     # test connection to open-meteo
     async def main():
         forecast: Forecast = await weather.get_weather_forecast(10.0, 10.0, 10, True)
-        print(forecast.current_weather)
+        print(forecast)
 
     asyncio.run(main())
 
