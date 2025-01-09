@@ -10,6 +10,11 @@ services:
     image: postgres:latest
     ports:
       - '6543:5432'
+    environment:
+      POSTGRES_DB: "bot_db"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+
     volumes:
       - pg_data:/var/lib/postgresql/data
 
