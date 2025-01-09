@@ -147,7 +147,7 @@ async def choose_interval(message: types.Message, state: FSMContext):
         return
     
     data = await state.get_data()
-    subscription = {
+    subscription_data = {
         'location_id': int(data['location_id']),
         'detail_type': data['detail_type'],
         'next_event_time': datetime.fromisoformat(data['next_event_time']),
@@ -155,6 +155,6 @@ async def choose_interval(message: types.Message, state: FSMContext):
     }
     subscription = None
     async with Session() as session:
-        subscription = await utils.create_subscription(subscription, session)
+        subscription = await utils.create_subscription(subscription_data, session)
     await message.answer(text='Подписка успешно создана')
     await state.set_state(None)
