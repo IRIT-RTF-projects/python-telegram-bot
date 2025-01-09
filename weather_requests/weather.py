@@ -61,15 +61,16 @@ class Weather:
         if number_of_days < 0 or number_of_days > 14:
             raise Exception('invalid number of days must be in 1:14 range')
         forecast = forecast.to_dict()
-        days = [None for _ in range(number_of_days)]
+        days = [None for _ in range(len(values_list))]
         for name, values_list in forecast['daily'].items():
             if not values_list: continue
-            for i in range(number_of_days):
+            for i in range(len(values_list)):
                 days[i] = days[i] or {}
                 days[i][name] = values_list[i]
 
         result = ''
-        for day in days:
+        for i in range(number_of_days):
+            day = days[i]
             result += f"""
 {day['time']}
 Температура: от {day['temperature_2m_max']} до {day['temperature_2m_min']}
