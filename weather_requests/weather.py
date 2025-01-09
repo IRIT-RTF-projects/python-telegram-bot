@@ -56,13 +56,15 @@ class Weather:
     def parse_forecast(
             self,
             forecast: Forecast,
-            days: int
+            number_of_days: int
         ) -> str:
+        if number_of_days < 0 or number_of_days > 14:
+            raise Exception('invalid number of days must be in 1:14 range')
         forecast = forecast.to_dict()
-        days = [None for _ in range(14)]
+        days = [None for _ in range(number_of_days)]
         for name, values_list in forecast['daily'].items():
             if not values_list: continue
-            for i in range(len(values_list)):
+            for i in range(len(number_of_days)):
                 days[i] = days[i] or {}
                 days[i][name] = values_list[i]
 
