@@ -64,7 +64,7 @@ class Weather:
         days = [None for _ in range(number_of_days)]
         for name, values_list in forecast['daily'].items():
             if not values_list: continue
-            for i in range(len(number_of_days)):
+            for i in range(number_of_days):
                 days[i] = days[i] or {}
                 days[i][name] = values_list[i]
 
