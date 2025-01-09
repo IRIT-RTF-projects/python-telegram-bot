@@ -29,7 +29,7 @@ class Location(Base):
 
 class Subscription(Base):
     location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
-    detail_type: Mapped[str] # detailed/short i know it could be an enum
+    detail_type: Mapped[str] # detailed / short i know it could be an enum
     next_event_time: Mapped[datetime] = mapped_column(insert_default=func.now())
     period: Mapped[int] # the number of hours in between the sends
 

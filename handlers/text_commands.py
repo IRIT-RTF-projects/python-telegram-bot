@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 from pydantic import BaseModel
 
 class Commands(BaseModel):
@@ -9,8 +11,17 @@ class Commands(BaseModel):
     get_menu: str = 'get_menu'
     get_help: str = 'памагити'
     add_location: str = 'Добавить локацию'
+    add_subscription: str = 'Добавить подписку'
+
+    def get_subscription_location(self, location_name) -> str:
+        return f'subscrlctn {location_name}'
 
     def get_location_weather(self, location_name) -> str:
         return f'location_weather {location_name}'
+    
+    detail_types: List[Tuple[str, str]] = [('Детализированный отчет', 'detailed'), ('Краткий отчет', 'short')]
+
+    def get_detail_type(self, detail_type): # detailed / short
+        return f'detail_type {detail_type}'
 
 commands = Commands()

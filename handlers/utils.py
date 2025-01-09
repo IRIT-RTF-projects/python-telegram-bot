@@ -28,3 +28,6 @@ async def create_location(location_data: Dict[str, any], session: AsyncSession) 
 
 async def check_location_exists(user_id: int, location_name: str, session: AsyncSession):
     return await location_crud.get_by_multiple_attributes({ "user_id": user_id, "name": location_name }, session)
+
+async def create_subscription(subscription_data: Dict[str, any], session: AsyncSession):
+    return await subscription_crud.create(subscription_data, session)
