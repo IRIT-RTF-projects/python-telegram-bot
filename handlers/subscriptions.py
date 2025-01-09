@@ -59,7 +59,7 @@ async def add_subscription(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(
-        StateFilter(AddSubscription.choose_location),
+        StateFilter(AddSubscription.choosing_location),
         F.data.contains(commands.get_subscription_location(''))
         )
 async def choose_location(callback: types.CallbackQuery, state: FSMContext):
