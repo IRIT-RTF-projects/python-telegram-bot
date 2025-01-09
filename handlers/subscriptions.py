@@ -14,7 +14,7 @@ import handlers.utils as utils
 router = Router()
 
 @router.callback_query(F.data == commands.my_subscriptions)
-async def get_my_locations(callback: types.CallbackQuery):
+async def get_my_subscriptions(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     user_id = callback.from_user.id
 
@@ -29,7 +29,7 @@ async def get_my_locations(callback: types.CallbackQuery):
                 callback_data=commands.get_subscription_info(str(subscription.id))
             )
         )
-
+    print('chto proishodit')
     builder.row(InlineKeyboardButton(text=commands.add_subscription, callback_data=commands.add_subscription))
     builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
 
