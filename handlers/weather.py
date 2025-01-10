@@ -11,7 +11,7 @@ router = Router()
 @router.message(F.location)
 async def send_weather_in_location(message: Message):
     latitude, longitude = message.location.latitude, message.location.longitude
-    forecast = await weather.get_weather_forecast(latitude, longitude, number_of_days=1, weather_now=True)
+    forecast = await weather.get_weather_forecast(latitude, longitude, number_of_days=2, weather_now=True)
     await message.answer(text=forecast)
     await Message.delete(message)
 

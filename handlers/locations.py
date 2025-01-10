@@ -46,7 +46,7 @@ async def get_weather_in_location(callback: CallbackQuery):
         forecast = await weather.get_weather_forecast(
             location.latitude,
             location.longitude,
-            number_of_days=1,
+            number_of_days=2,
             weather_now=True
         )
     except Exception as err:
@@ -63,7 +63,15 @@ async def get_weather_in_location(callback: CallbackQuery):
     F.data.contains(commands.delete_location(''))
 )
 async def delete_location(callback: types.CallbackQuery):
-    await callback.message.answer(text='в работе')
+    command = commands.get_location_weather("")
+    data = callback.data
+    location_id = data[data.find(command) + len(command):]
+    async with Session() as session:
+        try:
+            await utils.delete_location(location_id, session)
+        except LookupError:
+            await callback.mesage.answer('хмм... Похоже эта локация уже была удалена')
+    await callback.message.answer('Локация успешно удалена')
 
 
 class CreateLocation(StatesGroup):

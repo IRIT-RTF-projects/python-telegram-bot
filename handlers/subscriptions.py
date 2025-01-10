@@ -6,10 +6,11 @@ from aiogram.types import InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardBut
 from aiogram.filters import StateFilter
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from models.db import Session
 
+from models.db import Session
 from handlers.text_commands import commands
 import handlers.utils as utils
+from models.errors import ObjectNotFoundError
 
 router = Router()
 
@@ -74,7 +75,15 @@ async def get_subscription_info(callback: types.CallbackQuery):
     F.data.contains(commands.delete_subscription(''))
 )
 async def delete_subscription(callback: types.CallbackQuery):
-    await callback.message.answer(text='в работе')
+    command = commands.delete_location("")
+    data = callback.data
+    subscription_id = data[data.find(command) + len(command):]
+    async with Session() as session:
+        try:
+            await utils.delete_subscription(subscription_id, session)
+        except ObjectNotFoundError:
+            await callback.mesage.answer('хмм... Похоже эта подписка уже была удалена')
+    await callback.message.answer('Подписка успешно удалена')
 
 class AddSubscription(StatesGroup):
     choosing_location = State()
