@@ -117,7 +117,7 @@ class Weather:
         response = ''
         if weather_now:
             response += self.parse_weather_now(forecast) or ''
-        response += self.parse_forecast(forecast, number_of_days) or ''
+        response += self.parse_forecast(forecast, number_of_days, detail_type) or ''
         return response
 
 

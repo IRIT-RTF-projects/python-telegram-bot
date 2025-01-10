@@ -75,12 +75,12 @@ async def get_subscription_info(callback: types.CallbackQuery):
     F.data.contains(commands.delete_subscription(''))
 )
 async def delete_subscription(callback: types.CallbackQuery):
-    command = commands.delete_location("")
+    command = commands.delete_subscription("")
     data = callback.data
     subscription_id = data[data.find(command) + len(command):]
     async with Session() as session:
         try:
-            await utils.delete_subscription(subscription_id, session)
+            await utils.delete_subscription(int(subscription_id), session)
         except ObjectNotFoundError:
             await callback.mesage.answer('хмм... Похоже эта подписка уже была удалена')
     await callback.message.answer('Подписка успешно удалена')

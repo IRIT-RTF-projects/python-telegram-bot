@@ -63,12 +63,12 @@ async def get_weather_in_location(callback: CallbackQuery):
     F.data.contains(commands.delete_location(''))
 )
 async def delete_location(callback: types.CallbackQuery):
-    command = commands.get_location_weather("")
+    command = commands.delete_location('')
     data = callback.data
     location_id = data[data.find(command) + len(command):]
     async with Session() as session:
         try:
-            await utils.delete_location(location_id, session)
+            await utils.delete_location(int(location_id), session)
         except LookupError:
             await callback.mesage.answer('хмм... Похоже эта локация уже была удалена')
     await callback.message.answer('Локация успешно удалена')
