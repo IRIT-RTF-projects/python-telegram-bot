@@ -10,14 +10,16 @@ from weather_requests.weather import weather
 async def send_subscribtion_reports(bot: Bot):
     async with Session() as session:
         subscriptions = await subscription_crud.get_all(session)
-        
+
         now = datetime.now()
 
         for subscription in subscriptions:
 
-            if subscription.next_event_time > now:
+            next_event_time = subscription.next_event_time
+
+            if next_event_time > now:
                 continue
-            
+
             location = subscription.location
             user = subscription.location.user
 
@@ -35,8 +37,10 @@ async def send_subscribtion_reports(bot: Bot):
                 text=text
             )
 
+            new_event_time = next_event_time + timedelta(hours=subscription.period)
+
             await subscription_crud.update(
                 subscription.id,
-                {"next_event_time": subscription.next_event_time + timedelta(hours=subscription.period)},
+                {"next_event_time": new_event_time},
                 session,
             )

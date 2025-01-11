@@ -47,7 +47,7 @@ class CrudBase:
             update_data: Dict[str, any],
             session: AsyncSession
     ):
-        db_obj = self.get(item_id, session)
+        db_obj = await self.get(item_id, session)
         for name, value in update_data.items():
             setattr(db_obj, name, value)
 
