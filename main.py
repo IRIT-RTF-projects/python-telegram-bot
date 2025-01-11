@@ -2,9 +2,11 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from config import config
 import handlers as h
+from subscription_manager.send_reports import send_subscribtion_reports
 
 logging.basicConfig(level=logging.INFO)
 
@@ -22,6 +24,9 @@ dp.include_routers(
 
 
 async def main():
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(send_subscribtion_reports, "interval", seconds=10, args=(bot,))
+    scheduler.start()
     await dp.start_polling(bot)
 
 if __name__ == '__main__':

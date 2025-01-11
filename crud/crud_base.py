@@ -41,6 +41,21 @@ class CrudBase:
         await session.refresh(db_obj)
         return db_obj
 
+    async def update(
+            self,
+            item_id: int,
+            update_data: Dict[str, any],
+            session: AsyncSession
+    ):
+        db_obj = self.get(item_id, session)
+        for name, value in update_data.items():
+            setattr(db_obj, name, value)
+
+        session.add(db_obj)
+        await session.commit()
+        await session.refresh(db_obj)
+        return db_obj
+
     async def remove(
             self,
             item_id: int,

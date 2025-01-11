@@ -1,9 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 
 from crud.crud_base import CrudBase
-from models import Location, Subscription
+from models import Location, Subscription, User
 
 
 class SubscriptionCrud(CrudBase):
@@ -40,6 +40,20 @@ class SubscriptionCrud(CrudBase):
             .options(selectinload(Subscription.location))
         )
         return obj.scalars().first()
+    
+    async def get_all(
+            self,
+            session: AsyncSession
+    ):
+        subscriptions = await session.execute(
+            select(Subscription)
+            .options(
+                selectinload(Subscription.location)
+                .selectinload(Location.user)
+            )
+        )
+        subscriptions = subscriptions.scalars().all()
+        return subscriptions
 
 
 subscription_crud = SubscriptionCrud(Subscription)
