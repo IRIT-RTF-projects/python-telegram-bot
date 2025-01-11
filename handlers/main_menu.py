@@ -1,24 +1,47 @@
-from aiogram import Router, types, F
+from aiogram import F, Router, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from models.db import Session
-from handlers.text_commands import commands
 import handlers.utils as utils
+from handlers.text_commands import commands
+from models.db import Session
 
 router = Router()
+
 
 def get_main_menu_markup() -> types.InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     buttons = [
-        [InlineKeyboardButton(text=commands.my_locations, callback_data=commands.my_locations)],
-        [InlineKeyboardButton(text=commands.my_subscriptions, callback_data=commands.my_subscriptions)],
-        [InlineKeyboardButton(text=commands.weather_now, callback_data=commands.request_location)],
-        [InlineKeyboardButton(text=commands.get_help, callback_data=commands.get_help)],
+        [
+            InlineKeyboardButton(
+                text=commands.my_locations,
+                callback_data=commands.my_locations
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text=commands.my_subscriptions,
+                callback_data=commands.my_subscriptions
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text=commands.weather_now,
+                callback_data=commands.request_location
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text=commands.get_help,
+                callback_data=commands.get_help
+            )
+        ],
     ]
-    for row in buttons: builder.row(*row)
+    for row in buttons:
+        builder.row(*row)
     return builder.as_markup()
+
 
 @router.message(Command("start"))
 async def get_main_menu(message: types.Message) -> None:
@@ -33,6 +56,7 @@ async def get_main_menu(message: types.Message) -> None:
             'Главное меню',
             reply_markup=get_main_menu_markup()
         )
+
 
 @router.callback_query(F.data == commands.get_menu)
 async def get_main_menu_via_callback(callback: types.CallbackQuery) -> None:

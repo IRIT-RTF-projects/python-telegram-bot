@@ -1,16 +1,18 @@
-from aiogram import Router, F, types
-from aiogram.types import InlineKeyboardButton, CallbackQuery, KeyboardButton, ReplyKeyboardMarkup
+from aiogram import F, Router, types
 from aiogram.filters import StateFilter
-from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import (CallbackQuery, InlineKeyboardButton, KeyboardButton,
+                           ReplyKeyboardMarkup)
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+import handlers.utils as utils
 from handlers.text_commands import commands
 from models.db import Session
-import handlers.utils as utils
 from weather_requests.weather import weather
 
 router = Router()
+
 
 @router.callback_query(F.data == commands.my_locations)
 async def get_my_locations(callback: CallbackQuery):
@@ -25,11 +27,16 @@ async def get_my_locations(callback: CallbackQuery):
             text=location.name,
             callback_data=commands.get_location_weather(location.name)
             ))
-    builder.row(InlineKeyboardButton(text=commands.add_location, callback_data=commands.add_location))
-    builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
+    builder.row(InlineKeyboardButton(
+        text=commands.add_location, callback_data=commands.add_location)
+    )
+    builder.row(
+        InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu)
+    )
 
     await callback.message.answer("Ваши локации", reply_markup=builder.as_markup())
     await types.Message.delete(callback.message)
+
 
 @router.callback_query(F.data.contains(commands.get_location_weather("")))
 async def get_weather_in_location(callback: CallbackQuery):
@@ -51,13 +58,21 @@ async def get_weather_in_location(callback: CallbackQuery):
         )
     except Exception as err:
         print(err)
-        forecast = "Извините произошла ошибка при обращении к open-meteo. Попробуйте позднее"
-    
+        forecast = (
+            'Извините произошла ошибка при обращении к open-meteo.\n'
+            'Попробуйте позднее'
+        )
+
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text='Удалить локацию', callback_data=commands.delete_location(location.id)))
-    builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
+    builder.row(InlineKeyboardButton(
+        text='Удалить локацию', callback_data=commands.delete_location(location.id))
+    )
+    builder.row(
+        InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu)
+    )
     await callback.message.answer(text=forecast, reply_markup=builder.as_markup())
     await types.Message.delete(callback.message)
+
 
 @router.callback_query(
     F.data.contains(commands.delete_location(''))
@@ -81,12 +96,19 @@ class CreateLocation(StatesGroup):
 
 @router.callback_query(StateFilter(None), F.data == commands.add_location)
 async def add_location(callback: CallbackQuery, state: FSMContext):
-    kb = [[KeyboardButton(text='Дом'), KeyboardButton(text='Дача'), KeyboardButton(text='Работа')]]
+    kb = [
+        [
+            KeyboardButton(text='Дом'),
+            KeyboardButton(text='Дача'),
+            KeyboardButton(text='Работа')
+        ]
+    ]
     await callback.message.answer(
         "Выберите или придумайте сами имя для новой локации",
         reply_markup=ReplyKeyboardMarkup(keyboard=kb, one_time_keyboard=True)
         )
     await state.set_state(CreateLocation.choosing_name)
+
 
 @router.message(StateFilter(CreateLocation.choosing_name))
 async def choose_location_name(message: types.Message, state: FSMContext):
@@ -104,9 +126,15 @@ async def choose_location_name(message: types.Message, state: FSMContext):
         error_comment = 'Имя слишком длинное'
     if location_exists:
         error_comment = 'У вас уже есть локация с данным именем'
-    
+
     if error_comment:
-        kb = [[KeyboardButton(text='Дом'), KeyboardButton(text='Дача'), KeyboardButton(text='Работа')]]
+        kb = [
+            [
+                KeyboardButton(text='Дом'),
+                KeyboardButton(text='Дача'),
+                KeyboardButton(text='Работа')
+            ]
+        ]
         await message.answer(
             error_comment,
             reply_markup=ReplyKeyboardMarkup(keyboard=kb, one_time_keyboard=True)
@@ -118,6 +146,7 @@ async def choose_location_name(message: types.Message, state: FSMContext):
         text='Выберите нужную локацию и отправьте ее боту'
     )
 
+
 @router.message(StateFilter(CreateLocation.getting_location), F.location)
 async def choose_location_geo(message: types.Message, state: FSMContext) -> None:
     data = await state.get_data()
@@ -128,8 +157,8 @@ async def choose_location_geo(message: types.Message, state: FSMContext) -> None
         "latitude": message.location.latitude,
         "longitude": message.location.longitude,
         "user_id": user_id,
-    } 
+    }
     async with Session() as session:
-        location = await utils.create_location(obj_data, session)
+        await utils.create_location(obj_data, session)
     await message.answer('Локация добавлена успешно')
     await state.set_state(None)

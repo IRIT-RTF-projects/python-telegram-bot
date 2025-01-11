@@ -1,0 +1,12 @@
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    .env,
+    venv,
+    alembic,
+    presets
+extend-ignore = 
+    C901
+max-line-length = 90
+max-complexity = 5

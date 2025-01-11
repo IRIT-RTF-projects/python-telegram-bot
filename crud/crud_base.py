@@ -1,4 +1,5 @@
 from typing import Dict
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,7 +8,7 @@ class CrudBase:
 
     def __init__(self, model):
         self.model = model
-    
+
     async def get(
             self,
             item_id: int,
@@ -83,7 +84,7 @@ class CrudBase:
             )
         )
         return obj.scalars().all()
-    
+
     async def get_by_multiple_attributes(
         self,
         attrs: Dict[str, any],

@@ -1,18 +1,20 @@
 from datetime import datetime
 
-from aiogram import Router, F, types
-from aiogram.utils.keyboard import InlineKeyboardBuilder 
-from aiogram.types import InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+from aiogram import F, Router, types
 from aiogram.filters import StateFilter
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import (InlineKeyboardButton, KeyboardButton,
+                           ReplyKeyboardMarkup)
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from models.db import Session
-from handlers.text_commands import commands
 import handlers.utils as utils
+from handlers.text_commands import commands
+from models.db import Session
 from models.errors import ObjectNotFoundError
 
 router = Router()
+
 
 @router.callback_query(F.data == commands.my_subscriptions)
 async def get_my_subscriptions(callback: types.CallbackQuery):
@@ -22,7 +24,7 @@ async def get_my_subscriptions(callback: types.CallbackQuery):
     subscriptions = []
     async with Session() as session:
         subscriptions = await utils.get_user_subscriptions(user_id, session)
-    
+
         for subscription in subscriptions:
             builder.row(
                 InlineKeyboardButton(
@@ -31,10 +33,22 @@ async def get_my_subscriptions(callback: types.CallbackQuery):
                 )
             )
 
-    builder.row(InlineKeyboardButton(text=commands.add_subscription, callback_data=commands.add_subscription))
-    builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
-
-    await callback.message.answer("Ваши подписки на погоду", reply_markup=builder.as_markup())
+    builder.row(
+        InlineKeyboardButton(
+            text=commands.add_subscription,
+            callback_data=commands.add_subscription
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text='Обратно в меню',
+            callback_data=commands.get_menu
+        )
+    )
+    await callback.message.answer(
+        "Ваши подписки на погоду",
+        reply_markup=builder.as_markup()
+    )
     await types.Message.delete(callback.message)
 
 
@@ -47,15 +61,25 @@ async def get_subscription_info(callback: types.CallbackQuery):
     subscription_id = data[data.find(command) + len(command):]
 
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text='Удалить подписку', callback_data= commands.delete_subscription(subscription_id)))
-    builder.row(InlineKeyboardButton(text='Обратно в меню', callback_data=commands.get_menu))
+    builder.row(
+        InlineKeyboardButton(
+            text='Удалить подписку',
+            callback_data=commands.delete_subscription(subscription_id)
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text='Обратно в меню',
+            callback_data=commands.get_menu
+        )
+    )
 
     subscription = None
     location_name = None
     async with Session() as session:
         subscription = await utils.get_subscription_by_id(int(subscription_id), session)
         location_name = subscription.location.name
-    
+
     subscription_detail_type = None
     for detail_type_alias, detail_type in commands.detail_types:
         if detail_type == subscription.detail_type:
@@ -68,8 +92,12 @@ async def get_subscription_info(callback: types.CallbackQuery):
         f'Период между отчетами: {subscription.period} часов'
     )
 
-    await callback.message.answer(text=subscription_data, reply_markup=builder.as_markup())
+    await callback.message.answer(
+        text=subscription_data,
+        reply_markup=builder.as_markup()
+    )
     await types.Message.delete(callback.message)
+
 
 @router.callback_query(
     F.data.contains(commands.delete_subscription(''))
@@ -84,6 +112,7 @@ async def delete_subscription(callback: types.CallbackQuery):
         except ObjectNotFoundError:
             await callback.mesage.answer('хмм... Похоже эта подписка уже была удалена')
     await callback.message.answer('Подписка успешно удалена')
+
 
 class AddSubscription(StatesGroup):
     choosing_location = State()
@@ -150,7 +179,8 @@ async def choose_location(callback: types.CallbackQuery, state: FSMContext):
     )
 
     await types.Message.delete(callback.message)
-    
+
+
 @router.callback_query(
     StateFilter(AddSubscription.choosing_detail_type),
     F.data.contains(commands.get_detail_type(''))
@@ -173,6 +203,7 @@ async def choose_detail_type(callback: types.CallbackQuery, state: FSMContext):
 
     await types.Message.delete(callback.message)
 
+
 @router.message(
     StateFilter(AddSubscription.choosing_send_time)
 )
@@ -190,8 +221,13 @@ async def choose_send_time(message: types.Message, state: FSMContext):
             'Выберите или напишите сами интервал в часах между сообщениями\n'
             'Пример: 72 будет значить каждые 3 дня, a 168 раз в неделю'
         ),
-        reply_markup=ReplyKeyboardMarkup(keyboard=kb, one_time_keyboard=True, resize_keyboard=True)
+        reply_markup=ReplyKeyboardMarkup(
+            keyboard=kb,
+            one_time_keyboard=True,
+            resize_keyboard=True
+        )
     )
+
 
 @router.message(
     StateFilter(AddSubscription.choosing_interval)
@@ -204,11 +240,11 @@ async def choose_interval(message: types.Message, state: FSMContext):
     num = int(num)
     if num < 1 or num > 168:
         error_text = 'Число должно быть в пределах от 1 до 168'
-    
+
     if error_text:
         await message.answer(text=error_text)
         return
-    
+
     data = await state.get_data()
     subscription_data = {
         'location_id': int(data['location_id']),
@@ -216,8 +252,8 @@ async def choose_interval(message: types.Message, state: FSMContext):
         'next_event_time': datetime.fromisoformat(data['next_event_time']),
         'period': num
     }
-    subscription = None
+
     async with Session() as session:
-        subscription = await utils.create_subscription(subscription_data, session)
+        await utils.create_subscription(subscription_data, session)
     await message.answer(text='Подписка успешно создана')
     await state.set_state(None)

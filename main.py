@@ -1,9 +1,10 @@
 import asyncio
 import logging
+
 from aiogram import Bot, Dispatcher
 
 from config import config
-from handlers import *
+import handlers as h
 
 logging.basicConfig(level=logging.INFO)
 
@@ -12,11 +13,11 @@ bot = Bot(token=config['token'])
 dp = Dispatcher()
 
 dp.include_routers(
-    main_menu,
-    locations,
-    subscriptions,
-    weather,
-    help
+    h.main_menu,
+    h.locations,
+    h.subscriptions,
+    h.weather,
+    h.help
 )
 
 
