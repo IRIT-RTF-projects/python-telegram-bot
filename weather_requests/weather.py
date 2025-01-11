@@ -92,7 +92,7 @@ class Weather:
         forecast = await self.do_api_call(params=params)
         response = ''
         if weather_now:
-            response += parse_weather_now(forecast) or ''
+            response += parse_weather_now(forecast.current_weather.to_dict()) or ''
         response += self.parse_forecast(
             forecast, number_of_days, detail_type
         ) or ''
