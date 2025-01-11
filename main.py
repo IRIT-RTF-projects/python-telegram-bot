@@ -25,7 +25,7 @@ dp.include_routers(
 
 async def main():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(send_subscribtion_reports, "interval", seconds=10, args=(bot,))
+    scheduler.add_job(send_subscribtion_reports, "interval", seconds=60, args=(bot,))
     scheduler.start()
     await dp.start_polling(bot)
 
