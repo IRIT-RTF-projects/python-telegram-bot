@@ -1,5 +1,7 @@
 # Python Telegram Bot on Aiogram with Docker Compose
 
+## Bot is accessible now [try it](https://t.me/at35_weather_bot)
+
 This repository contains a Python Telegram bot built using the [Aiogram](https://docs.aiogram.dev/) framework. The bot is designed to be easily deployed and run using Docker Compose.
 
 - ## Technologies Used
