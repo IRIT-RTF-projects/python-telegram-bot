@@ -1,7 +1,8 @@
 services:
   bot:
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     build:
       dockerfile: ./Dockerfile
       context: .
@@ -10,10 +11,18 @@ services:
     image: postgres:latest
     ports:
       - '6543:5432'
+    user: postgres
     environment:
+      PG_USER: "postgres"
       POSTGRES_DB: "bot_db"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
 
     volumes:
       - pg_data:/var/lib/postgresql/data
