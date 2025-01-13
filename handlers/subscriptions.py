@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiogram import F, Router, types
 from aiogram.filters import StateFilter
@@ -26,9 +26,10 @@ async def get_my_subscriptions(callback: types.CallbackQuery):
         subscriptions = await utils.get_user_subscriptions(user_id, session)
 
         for subscription in subscriptions:
+            next_event_time = subscription.next_event_time + timedelta(hours=5)
             builder.row(
                 InlineKeyboardButton(
-                    text=f'{subscription.location.name} {subscription.next_event_time}',
+                    text=f'{subscription.location.name} {next_event_time}',
                     callback_data=commands.get_subscription_info(str(subscription.id))
                 )
             )
