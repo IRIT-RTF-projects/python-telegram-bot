@@ -86,9 +86,10 @@ async def get_subscription_info(callback: types.CallbackQuery):
         if detail_type == subscription.detail_type:
             subscription_detail_type = detail_type_alias
 
+    next_event_time = subscription.next_event_time + timedelta(hours=5)
     subscription_data = (
         f'Локация: {location_name}\n'
-        f'Следующий отчет: {subscription.next_event_time}\n'
+        f'Следующий отчет: {next_event_time}\n'
         f'Тип отчета: {subscription_detail_type}\n'
         f'Период между отчетами: {subscription.period} часов'
     )
